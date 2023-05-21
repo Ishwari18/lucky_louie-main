@@ -41,7 +41,7 @@ export default function JackPot({ p, time, title, second }) {
             backgroundClip: "text",
           }}
         >
-          8,403 USDC
+          8,403 ETH
         </h2>
         <p className={styles.p}>
           {p}

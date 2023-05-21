@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity >=0.8.10; 
+pragma solidity >=0.8.10;
 
 import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
@@ -12,14 +12,23 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 contract BATMAN is ERC20, Ownable {
     using SafeMath for uint256;
 
-    IUniswapV2Router02 public immutable uniswapV2Router;
-    address public immutable uniswapV2Pair;
+    IUniswapV2Router02 public uniswapV2Router;
+    address public uniswapV2Pair;
     address public constant deadAddress = address(0xdead);
 
     bool private swapping;
 
+     uint256 public moment;
+    address public lastUser;
+    uint256 public amountPerHour;
+
+     event GetReward(address _winner, uint256 _reward);
+    event UserUpdated(address _newUser, uint256 _timestamp);
+    event Updated(address _lastUser, uint256 _timestamp);
+
     address public marketingWallet;
     address public devWallet;
+    address public weeklyWallet;
 
     uint256 public maxTransactionAmount;
     uint256 public swapTokensAtAmount;
@@ -33,21 +42,36 @@ contract BATMAN is ERC20, Ownable {
     mapping(address => uint256) private _holderLastTransferTimestamp; // to hold last Transfers temporarily during launch
     bool public transferDelayEnabled = true;
 
-    uint256 public buyTotalFees;
-    uint256 public buyMarketingFee;
-    uint256 public buyLiquidityFee;
-    uint256 public buyDevFee;
-
-    uint256 public sellTotalFees;
-    uint256 public sellMarketingFee;
-    uint256 public sellLiquidityFee;
-    uint256 public sellDevFee;
-
     uint256 public tokensForMarketing;
     uint256 public tokensForLiquidity;
     uint256 public tokensForDev;
+    uint256 public tokensForWeekly;
+    uint256 public tokensForHourly;
 
     /******************/
+    uint256 public buyweeklyfee = 3;
+    uint256 public buyhourlyfee = 1;
+    uint256 public buyMarketingFee = 2;
+    uint256 public buyLiquidityFee = 0;
+    uint256 public buyDevFee = 1;
+    uint256 public buyTotalFees =
+        buyMarketingFee +
+            buyLiquidityFee +
+            buyDevFee +
+            buyweeklyfee +
+            buyhourlyfee;
+
+    uint256 public sellweeklyfee = 3;
+    uint256 public sellhourlyfee = 1;
+    uint256 public sellMarketingFee = 2;
+    uint256 public sellLiquidityFee = 0;
+    uint256 public sellDevFee = 1;
+    uint256 public sellTotalFees =
+        sellMarketingFee +
+            sellLiquidityFee +
+            sellDevFee +
+            sellweeklyfee +
+            sellhourlyfee;
 
     // deadblock
     uint256 public deadBlock;
@@ -94,41 +118,11 @@ contract BATMAN is ERC20, Ownable {
     event ManualNukeLP();
 
     constructor() ERC20("BATMAN", unicode"BATMAN") {
-        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(
-            0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D
-        );
-
-        excludeFromMaxTransaction(address(_uniswapV2Router), true);
-        uniswapV2Router = _uniswapV2Router;
-
-        uniswapV2Pair = IUniswapV2Factory(_uniswapV2Router.factory())
-            .createPair(address(this), _uniswapV2Router.WETH());
-        excludeFromMaxTransaction(address(uniswapV2Pair), true);
-        _setAutomatedMarketMakerPair(address(uniswapV2Pair), true);
-
-        uint256 _buyMarketingFee = 1;
-        uint256 _buyLiquidityFee = 0;
-        uint256 _buyDevFee = 99;
-
-        uint256 _sellMarketingFee = 1;
-        uint256 _sellLiquidityFee = 0;
-        uint256 _sellDevFee = 99;
-
         uint256 totalSupply = 420_000_000_000_000 * 10**18;
 
         maxTransactionAmount = 20_000_000 * 1e18; // 2% from total supply maxTransactionAmountTxn
         maxWallet = 20_000_000 * 1e18; // 2% from total supply maxWallet
         swapTokensAtAmount = (totalSupply * 10) / 10000; // 0.1% swap wallet
-
-        buyMarketingFee = _buyMarketingFee;
-        buyLiquidityFee = _buyLiquidityFee;
-        buyDevFee = _buyDevFee;
-        buyTotalFees = buyMarketingFee + buyLiquidityFee + buyDevFee;
-
-        sellMarketingFee = _sellMarketingFee;
-        sellLiquidityFee = _sellLiquidityFee;
-        sellDevFee = _sellDevFee;
-        sellTotalFees = sellMarketingFee + sellLiquidityFee + sellDevFee;
 
         marketingWallet = address(0x712bf6aB115E7cEf3511f77AfDB18f4A1D051857); // set as marketing wallet
         devWallet = address(0xa4b28bD1439a7cFFc6D109e74CcDbc0848De78bF); // set as dev wallet
@@ -144,14 +138,34 @@ contract BATMAN is ERC20, Ownable {
         excludeFromMaxTransaction(address(this), true);
         excludeFromMaxTransaction(address(0xdead), true);
 
-        /*
-            _mint is an internal function in ERC20.sol that is only called here,
-            and CANNOT be called ever again
-        */
-        _mint(msg.sender, totalSupply);
+       // _mint(msg.sender, totalSupply);
+    }
+
+    function mint(address to, uint256 value) public {
+        _mint(to, value);
     }
 
     receive() external payable {}
+
+    function setWeeklyWallet(address _weeklyWallet) external onlyOwner {
+      weeklyWallet = _weeklyWallet;
+    }
+
+    function setUniswapRouter(address _routerAddress) public onlyOwner {
+        // Ensure it can only be set once
+
+        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(
+            _routerAddress
+        );
+
+        excludeFromMaxTransaction(address(_uniswapV2Router), true);
+        uniswapV2Router = _uniswapV2Router;
+
+        uniswapV2Pair = IUniswapV2Factory(_uniswapV2Router.factory())
+            .createPair(address(this), _uniswapV2Router.WETH());
+        excludeFromMaxTransaction(address(uniswapV2Pair), true);
+        _setAutomatedMarketMakerPair(address(uniswapV2Pair), true);
+    }
 
     // once enabled, can never be turned off
     function enableTrading() external onlyOwner {
@@ -418,29 +432,36 @@ contract BATMAN is ERC20, Ownable {
             // on sell
             if (automatedMarketMakerPairs[to] && sellTotalFees > 0) {
                 fees = amount.mul(sellTotalFees).div(100);
-                tokensForLiquidity += (fees * sellLiquidityFee) / sellTotalFees;
-                tokensForDev += (fees * sellDevFee) / sellTotalFees;
-                tokensForMarketing += (fees * sellMarketingFee) / sellTotalFees;
+                tokensForLiquidity += (fees * sellLiquidityFee) / 100;
+                tokensForDev += (fees * sellDevFee) / 100;
+                tokensForMarketing += (fees * sellMarketingFee) / 100;
+                tokensForHourly += (fees * sellhourlyfee) / 100;
             }
             // on buy
             else if (automatedMarketMakerPairs[from] && buyTotalFees > 0) {
                 fees = amount.mul(buyTotalFees).div(100);
-                tokensForLiquidity += (fees * buyLiquidityFee) / buyTotalFees;
-                tokensForDev += (fees * buyDevFee) / buyTotalFees;
-                tokensForMarketing += (fees * buyMarketingFee) / buyTotalFees;
+                tokensForLiquidity += (fees * buyLiquidityFee) / 100;
+                tokensForDev += (fees * buyDevFee) / 100;
+                tokensForMarketing += (fees * buyMarketingFee) / 100;
+                tokensForHourly += (fees * buyhourlyfee) / 100;
+
+                if (msg.value > 0.05 ether) {
+              update(msg.value, block.timestamp, msg.sender);
+            }
             }
 
             if (fees > 0) {
-                super._transfer(from, address(this), fees);
+                super._transfer(from, address(this), fees); //sends fee from the buyer/seller to this account
             }
 
             amount -= fees;
         }
 
         super._transfer(from, to, amount);
+       
     }
 
-    function swapTokensForEth(uint256 tokenAmount) private {
+    function swapTokensForEth(uint256 tokenAmount) private returns(uint256)  {
         // generate the uniswap pair path of token -> weth
         address[] memory path = new address[](2);
         path[0] = address(this);
@@ -448,14 +469,27 @@ contract BATMAN is ERC20, Ownable {
 
         _approve(address(this), address(uniswapV2Router), tokenAmount);
 
-        // make the swap
-        uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(
-            tokenAmount,
-            0, // accept any amount of ETH
-            path,
-            address(this),
-            block.timestamp
-        );
+        // // make the swap
+        // uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(
+        //     tokenAmount,
+        //     0, // accept any amount of ETH
+        //     path,
+        //     address(this),
+        //     block.timestamp
+        // );
+
+        // Perform the swap
+    uint256[] memory amounts = uniswapV2Router.swapExactTokensForETH(
+        tokenAmount,
+        0, // Accept any amount of ETH
+        path,
+        address(this),
+        block.timestamp
+    );
+
+    return amounts[1]; 
+
+        
     }
 
     function addLiquidity(uint256 tokenAmount, uint256 ethAmount) private {
@@ -526,4 +560,63 @@ contract BATMAN is ERC20, Ownable {
             value: address(this).balance
         }("");
     }
+
+
+    function transferWeeklyFee() external  onlyOwner{
+        require(tokensForWeekly > 0, "No weekly fee available");
+
+        uint256 weeklyethAmount = swapTokensForEth(tokensForHourly);
+        payable(lastUser).transfer(weeklyethAmount);
+        tokensForWeekly = 0; // Reset the weekly fee amount after transfer
+    }
+
+    function transferTokensForMarketing() external onlyOwner  {
+     tokensForMarketing = 0; // Reset tokensForMarketing
+
+    // Transfer the marketing tokens to the marketing wallet
+    _transfer(address(this), marketingWallet, tokensForMarketing);
+    }
+
+    function transferTokensForDev() external onlyOwner {
+    tokensForDev = 0; // Reset tokensForDev
+
+    // Transfer the dev tokens to the dev wallet
+    _transfer(address(this), devWallet, tokensForDev);
+    }
+
+
+    function update(
+        uint256 _amount,
+        uint256 _time,
+        address _user
+    ) internal {
+        amountPerHour += _amount;
+
+        if (moment == 0) {
+            moment = _time;
+            if (_amount > 5 * 10**17) {
+                lastUser = _user;
+                emit UserUpdated(lastUser, moment);
+            }
+            return;
+        }
+
+        if (_time - moment < 3600) {
+            if (amountPerHour >= 5 * 10**17) {
+                moment = _time;
+                amountPerHour = 0;
+                if (_amount >= 5 * 10**17) {
+                    lastUser = _user;
+                    emit UserUpdated(lastUser, moment);
+                }
+                emit Updated(lastUser, moment);
+            }
+        } else {
+             // Sends the jackpot
+               uint256 ethAmount = swapTokensForEth(tokensForHourly);
+               payable(lastUser).transfer(ethAmount);
+        }
+    }
+
+    
 }
