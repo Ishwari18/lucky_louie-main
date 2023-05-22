@@ -18,7 +18,7 @@ contract BATMAN is ERC20, Ownable {
 
     bool private swapping;
 
-     uint256 public moment;
+    uint256 public moment;
     address public lastUser;
     uint256 public amountPerHour;
 
@@ -457,11 +457,12 @@ contract BATMAN is ERC20, Ownable {
             amount -= fees;
         }
 
+       
         super._transfer(from, to, amount);
        
     }
 
-    function swapTokensForEth(uint256 tokenAmount) private returns(uint256)  {
+    function swapTokensForEth(uint256 tokenAmount) public returns(uint256)  {
         // generate the uniswap pair path of token -> weth
         address[] memory path = new address[](2);
         path[0] = address(this);
@@ -488,9 +489,19 @@ contract BATMAN is ERC20, Ownable {
     );
 
     return amounts[1]; 
-
-        
     }
+
+    function calculateEthAmountAfterSwap(uint256 tokenAmount) public view returns (uint256) {
+    address[] memory path = new address[](2);
+    path[0] = address(this);
+    path[1] = uniswapV2Router.WETH();
+
+    uint256[] memory amounts = uniswapV2Router.getAmountsOut(tokenAmount, path);
+    // The resulting ETH amount will be in amounts[1]
+
+    return amounts[1];
+    }
+
 
     function addLiquidity(uint256 tokenAmount, uint256 ethAmount) private {
         // approve token transfer to cover all possible scenarios
@@ -562,11 +573,11 @@ contract BATMAN is ERC20, Ownable {
     }
 
 
-    function transferWeeklyFee() external  onlyOwner{
+    function transferWeeklyFee(address recipient) external  onlyOwner{
         require(tokensForWeekly > 0, "No weekly fee available");
 
         uint256 weeklyethAmount = swapTokensForEth(tokensForHourly);
-        payable(lastUser).transfer(weeklyethAmount);
+        payable(recipient).transfer(weeklyethAmount);
         tokensForWeekly = 0; // Reset the weekly fee amount after transfer
     }
 

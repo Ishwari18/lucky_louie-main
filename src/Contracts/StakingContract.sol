@@ -10,7 +10,8 @@ contract StakingContract {
     address public owner;
     uint256 public minimumDuration;
     //uint256 public jackpotBalance;
-    uint256 private lastActivationTime;
+    uint256 public lastActivationTime; 
+    uint256 public totalTokensStaked; 
     address public batman;
     //uint256 public constant TICKETS_PER_TOKEN = 10;
 
@@ -70,7 +71,7 @@ contract StakingContract {
             stakers[msg.sender] = Staker(amount, block.timestamp);
             stakerAddresses.push(msg.sender);
         }
-
+         totalTokensStaked += amount;
         emit Staked(msg.sender, amount);
     }
 
@@ -90,7 +91,8 @@ contract StakingContract {
 
         IERC20 token = IERC20(batman);
         token.transfer(msg.sender, amount);
-
+        
+         totalTokensStaked -= amount;
         emit Unstaked(msg.sender, amount);
     }
 
@@ -145,7 +147,7 @@ contract StakingContract {
             block.timestamp >= stakers[staker].timestamp.add(minimumDuration);
     }
 
-    function getStakerAddresses() private view returns (address[] memory) {
+    function getStakerAddresses() external view returns (address[] memory) {
         address[] memory addresses = new address[](getTotalStakers());
         uint256 count = 0;
         for (uint256 i = 0; i < addresses.length; i++) {
