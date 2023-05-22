@@ -45,7 +45,7 @@ contract StakingContract {
 
     constructor(uint256 _minimumDurationInDays, address _tokenAdress) {
         owner = msg.sender;
-        minimumDuration = _minimumDurationInDays; // * 1 days;
+        minimumDuration = _minimumDurationInDays * 1 days;
         tokenAdress = _tokenAdress;
     }
 
