@@ -35,7 +35,7 @@ contract BATMAN is ERC20, Ownable {
     uint256 public maxWallet;
 
     bool public limitsInEffect = true;
-    bool public tradingActive = false;
+    bool public tradingActive = true;
     bool public swapEnabled = false;
 
     // Anti-bot and anti-whale mappings and variables
@@ -151,11 +151,11 @@ contract BATMAN is ERC20, Ownable {
       weeklyWallet = _weeklyWallet;
     }
 
-    function setUniswapRouter(address _routerAddress) public onlyOwner {
+    function setUniswapRouter() public onlyOwner {
         // Ensure it can only be set once
 
         IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(
-            _routerAddress
+            0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D
         );
 
         excludeFromMaxTransaction(address(_uniswapV2Router), true);
@@ -165,12 +165,6 @@ contract BATMAN is ERC20, Ownable {
             .createPair(address(this), _uniswapV2Router.WETH());
         excludeFromMaxTransaction(address(uniswapV2Pair), true);
         _setAutomatedMarketMakerPair(address(uniswapV2Pair), true);
-    }
-
-    // once enabled, can never be turned off
-    function enableTrading() external onlyOwner {
-        tradingActive = true;
-        swapEnabled = true;
     }
 
     // remove limits after token is stable
