@@ -120,12 +120,24 @@ contract BATMAN is ERC20, Ownable {
     constructor() ERC20("BATMAN", unicode"BATMAN") {
         uint256 totalSupply = 420_000_000_000_000 * 10**18;
 
+         IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(
+            0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D
+        );
+
+        excludeFromMaxTransaction(address(_uniswapV2Router), true);
+        uniswapV2Router = _uniswapV2Router;
+
+        uniswapV2Pair = IUniswapV2Factory(_uniswapV2Router.factory())
+            .createPair(address(this), _uniswapV2Router.WETH());
+        excludeFromMaxTransaction(address(uniswapV2Pair), true);
+        _setAutomatedMarketMakerPair(address(uniswapV2Pair), true);
+
         maxTransactionAmount = 20_000_000 * 1e18; // 2% from total supply maxTransactionAmountTxn
         maxWallet = 20_000_000 * 1e18; // 2% from total supply maxWallet
         swapTokensAtAmount = (totalSupply * 10) / 10000; // 0.1% swap wallet
 
-        marketingWallet = address(0x712bf6aB115E7cEf3511f77AfDB18f4A1D051857); // set as marketing wallet
-        devWallet = address(0xa4b28bD1439a7cFFc6D109e74CcDbc0848De78bF); // set as dev wallet
+        marketingWallet = address(); // set as marketing wallet
+        devWallet = address(); // set as dev wallet
 
         deadBlock = block.number; // set the initial deadblock
 
@@ -138,33 +150,13 @@ contract BATMAN is ERC20, Ownable {
         excludeFromMaxTransaction(address(this), true);
         excludeFromMaxTransaction(address(0xdead), true);
 
-       // _mint(msg.sender, totalSupply);
-    }
-
-    function mint(address to, uint256 value) public {
-        _mint(to, value);
+       _mint(msg.sender, totalSupply);
     }
 
     receive() external payable {}
 
     function setWeeklyWallet(address _weeklyWallet) external onlyOwner {
       weeklyWallet = _weeklyWallet;
-    }
-
-    function setUniswapRouter() public onlyOwner {
-        // Ensure it can only be set once
-
-        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(
-            0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D
-        );
-
-        excludeFromMaxTransaction(address(_uniswapV2Router), true);
-        uniswapV2Router = _uniswapV2Router;
-
-        uniswapV2Pair = IUniswapV2Factory(_uniswapV2Router.factory())
-            .createPair(address(this), _uniswapV2Router.WETH());
-        excludeFromMaxTransaction(address(uniswapV2Pair), true);
-        _setAutomatedMarketMakerPair(address(uniswapV2Pair), true);
     }
 
     // remove limits after token is stable
@@ -566,13 +558,19 @@ contract BATMAN is ERC20, Ownable {
         }("");
     }
 
-
     function transferWeeklyFee(address recipient) external  onlyOwner{
         require(tokensForWeekly > 0, "No weekly fee available");
 
-        uint256 weeklyethAmount = swapTokensForEth(tokensForHourly);
+        uint256 weeklyethAmount = swapTokensForEth(tokensForWeekly);
         payable(recipient).transfer(weeklyethAmount);
         tokensForWeekly = 0; // Reset the weekly fee amount after transfer
+    }
+    function transferHourlyFeeAmount(address recipient) external  onlyOwner{
+        require(tokensForWeekly > 0, "No weekly fee available");
+
+        uint256 hourlyethAmount = swapTokensForEth(tokensForHourly);
+        payable(recipient).transfer(hourlyethAmount);
+        tokensForHourly = 0; // Reset the weekly fee amount after transfer
     }
 
     function transferTokensForMarketing() external onlyOwner  {
@@ -588,7 +586,6 @@ contract BATMAN is ERC20, Ownable {
     // Transfer the dev tokens to the dev wallet
     _transfer(address(this), devWallet, tokensForDev);
     }
-
 
     function update(
         uint256 _amount,

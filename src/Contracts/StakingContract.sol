@@ -12,7 +12,7 @@ contract StakingContract {
     //uint256 public jackpotBalance;
     uint256 public lastActivationTime; 
     uint256 public totalTokensStaked; 
-    address public batman;
+    address public tokenAdress;
     //uint256 public constant TICKETS_PER_TOKEN = 10;
 
     struct Staker {
@@ -43,10 +43,10 @@ contract StakingContract {
     _;
 }
 
-    constructor(uint256 _minimumDurationInDays, address _batman) {
+    constructor(uint256 _minimumDurationInDays, address _tokenAdress) {
         owner = msg.sender;
         minimumDuration = _minimumDurationInDays; // * 1 days;
-        batman = _batman;
+        tokenAdress = _tokenAdress;
     }
 
     function getJackpotBalance() external view onlyWithinDuration returns (uint256) {
@@ -56,7 +56,7 @@ contract StakingContract {
     function stake(uint256 amount) external payable {
         require(amount > 0, "Amount must be greater than zero.");
 
-        IERC20 token = IERC20(batman);
+        IERC20 token = IERC20(tokenAdress);
         require(token.balanceOf(msg.sender) >= amount, "Insufficient balance.");
         require(
             token.allowance(msg.sender, address(this)) >= amount,
@@ -89,7 +89,7 @@ contract StakingContract {
         uint256 amount = stakers[msg.sender].stakedAmount;
         delete stakers[msg.sender];
 
-        IERC20 token = IERC20(batman);
+        IERC20 token = IERC20(tokenAdress);
         token.transfer(msg.sender, amount);
         
          totalTokensStaked -= amount;
@@ -167,6 +167,11 @@ contract StakingContract {
             }
         }
         return count;
+    }
+
+    function withdraw() public onlyOwner{
+        require(msg.sender == owner, "Only the contract owner can withdraw funds");
+        payable(msg.sender).transfer(address(this).balance);
     }
 
     receive() external payable {
