@@ -5,7 +5,7 @@ const provider = new ethers.providers.JsonRpcProvider(networks.sepolia.rpcUrl);
 
 const styles = {
   NextRound:
-    "w-full p-9 my-4 md:my-0 rounded-3xl relative bg-[color:var(--dark-red)]",
+    "w-full p-9 my-4 md:my-0 rounded-3xl relative bg-[color:var(--red)]",
   h1: "text-[1.8em]",
   time: "text-[1.8em] font-bold my-8 mx-0 p-4 bg-[#1F1F1F] rounded-3xl text-center",
 };
@@ -13,7 +13,7 @@ const styles = {
 export default function NextRound() {
   const [timeLeft, setTimeLeft] = useState(0);
 
-  const stakingcontractAddress = "0x9fA865CF5a1f341c0f9a9d6bBd9A74888C1Bccd2";
+  const stakingcontractAddress = "0x6214f33864D228B8AA86336837575fE2c7712E87";
 const stakingcontractABI = [
 	{
 		"inputs": [
@@ -155,6 +155,19 @@ const stakingcontractABI = [
 	},
 	{
 		"inputs": [],
+		"name": "lastActivationTime",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "minimumDuration",
 		"outputs": [
 			{
@@ -249,6 +262,7 @@ const stakingcontractABI = [
       try {
         const contract = new ethers.Contract(stakingcontractAddress, stakingcontractABI, provider);
         const lastActivationTime = await contract.lastActivationTime();
+		//console.log(lastActivationTime);
         const currentTime = Math.floor(Date.now() / 1000);
         const countdown = 7 * 24 * 60 * 60; // 7 days in seconds
         const timeSinceLastActivation = currentTime - lastActivationTime.toNumber();

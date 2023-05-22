@@ -1,4 +1,4 @@
-import JackPot from "../JackPot";
+import JackPot1 from "../JackPot1";
 import Competition from "./Competition";
 import LastWinner from "./LastWinner";
 import NextRound from "./NextRound";
@@ -18,7 +18,7 @@ const styles = {
 export default function Section2() {
   return (
     <section className={styles.section2} id="stake">
-      <JackPot
+      <JackPot1
         p={
           "By staking your $777 tokens, you are entering yourself into our weekly jackpot. Every week one random staker will be selected to win the entirety of our weekly jackpot through our trustless smart contract. The more tokens you have staked, the more chances you have to win."
         }

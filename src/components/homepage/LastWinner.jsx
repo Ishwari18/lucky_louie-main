@@ -12,7 +12,7 @@ const styles = {
   winnerInfo: "text-center mt-7",
 };
 
-const stakingcontractAddress = "0x9fA865CF5a1f341c0f9a9d6bBd9A74888C1Bccd2";
+const stakingcontractAddress = "0x6214f33864D228B8AA86336837575fE2c7712E87";
 const stakingcontractABI = [
 	{
 		"inputs": [
@@ -147,6 +147,19 @@ const stakingcontractABI = [
 				"internalType": "address[]",
 				"name": "",
 				"type": "address[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "lastActivationTime",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",

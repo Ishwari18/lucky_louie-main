@@ -1,247 +1,11 @@
-REACT_APP_INFURA_ID = e4a463f7294c463cbf1a697b48cbd356
-REACT_APP_STAKE_CONTRACT_ADDRESS = 0x9E870ef29b677C3aCb625f95a79bc19970780B9A
-REACT_APP_TOKEN_CONTRACT_ADDRESS = 0x9E870ef29b677C3aCb625f95a79bc19970780B9A
-REACT_APP_STAKE_CONTRACT_ABI = [
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_minimumDurationInDays",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "_batman",
-				"type": "address"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "winner",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "JackpotWon",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "Received",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "staker",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "Staked",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "staker",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "Unstaked",
-		"type": "event"
-	},
-	{
-		"inputs": [],
-		"name": "activateRaffle",
-		"outputs": [],
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "batman",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "getJackpotBalance",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "getStakerAddresses",
-		"outputs": [
-			{
-				"internalType": "address[]",
-				"name": "",
-				"type": "address[]"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "lastActivationTime",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "minimumDuration",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "owner",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "stake",
-		"outputs": [],
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "stakers",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "stakedAmount",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "timestamp",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "totalTokensStaked",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "unstake",
-		"outputs": [],
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"stateMutability": "payable",
-		"type": "receive"
-	}
-]
-REACT_APP_TOKEN_CONTRACT_ABI = [
+/* eslint-disable react/prop-types */
+import JackPotImg from "../assets/jackpot.png";
+import JackPotImg2 from "../assets/jackpot2.png";
+import React, { useState, useEffect } from 'react';
+const { ethers, BigNumber } = require("ethers");
+
+const tokenContractAddress = "0x8A5F0EE5b38e775c374EF8b90dCAdaa3c4E88803";
+const tokenContractABI = [
 	{
 		"inputs": [],
 		"stateMutability": "nonpayable",
@@ -704,6 +468,25 @@ REACT_APP_TOKEN_CONTRACT_ABI = [
 	{
 		"inputs": [],
 		"name": "buyweeklyfee",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenAmount",
+				"type": "uint256"
+			}
+		],
+		"name": "calculateEthAmountAfterSwap",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -1206,6 +989,25 @@ REACT_APP_TOKEN_CONTRACT_ABI = [
 		"type": "function"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenAmount",
+				"type": "uint256"
+			}
+		],
+		"name": "swapTokensForEth",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"name": "symbol",
 		"outputs": [
@@ -1589,3 +1391,85 @@ REACT_APP_TOKEN_CONTRACT_ABI = [
 		"type": "receive"
 	}
 ]
+
+export default function JackPot2({ p, time, title, second }) {
+    const [returnValue, setReturnValue] = useState(0);
+
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    provider.send("eth_requestAccounts", []);
+  
+    const signer = provider.getSigner();
+
+    useEffect(() => {
+        const getTokensForHourly = async () => {
+            const contract = new ethers.Contract(
+                tokenContractAddress,
+                tokenContractABI,
+                signer
+              );
+          try {
+            const tokensForHourlyValue = await contract.tokensForHourly();
+            const result = await contract.calculateEthAmountAfterSwap(tokensForHourlyValue);
+          //console.log(result);
+            setReturnValue(parseFloat(result));
+          } catch (error) {
+            console.error("Failed to get tokensForHourly value:", error);
+          }
+        };
+    
+        getTokensForHourly();
+      }, []);
+
+
+  const styles = {
+    jackpot: "relative md:mb-60 mb-[300px]",
+    jackpotImg: `${second ? "md:h-[550px]" : "md:h-[450px]"} ${
+      !second && "h-[295px]"
+    } w-auto
+    }`,
+    h1: "text-[2.5em] text-center mb-7 parisienne",
+    mainContent:
+      "flex flex-col flex-wrap md:flex-nowrap justify-center items-center w-full py-5 absolute bottom-[-250px] md:bottom-[-200px] gap-2 rounded-3xl bg-[#3232328F]",
+    morphism:
+      "bg-gray-100 bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-5",
+    p: "text-[0.8em] mx-auto w-[81%] text-center",
+    green: "text-[color:var(--light-green)] underline",
+    h2: "text-[2.2em] font-bold",
+    h3: "text-[1.7em] font-bold",
+    blue: "text-[#6BD3FA] font-bold text-[1]",
+  };
+  return (
+    <div className={styles.jackpot}>
+      <h1 className={styles.h1}>{title}</h1>
+      <img
+        className={styles.jackpotImg}
+        src={second ? JackPotImg2 : JackPotImg}
+        alt=""
+      />
+      <div className={styles.mainContent}>
+        <h3 className={styles.h3}>Jackpot</h3>
+        {time && <p className={styles.p + " " + styles.blue}>{time}</p>}
+        <h2
+          className={styles.h2}
+          style={{
+            background:
+              "linear-gradient(90deg, #B24FAB 2.41%, #D85388 106.17%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+          }}
+        >
+          {returnValue} ETH
+        </h2>
+        <p className={styles.p}>
+          {p}
+          {/* This is guaranteed by a{" "}
+          <span className={styles.green}>smart contract</span>. */}
+        </p>
+        <p className={`${styles.p} ${styles.green}`}>
+          Last wallet Address: <br /> 0x0000.0000
+        </p>
+      </div>
+    </div>
+  );
+}
