@@ -1830,7 +1830,7 @@ const totalTokens = await tokenContract.balanceOf(walletAddress);
               value={stakeAmount}
             />
             <button className={styles.pill} onClick={handleStake}>
-              Percentage
+              Stake
             </button>
             <button className={styles.pill} onClick={handleUnstake} >
               Unstake
@@ -1841,12 +1841,12 @@ const totalTokens = await tokenContract.balanceOf(walletAddress);
             <input
               type="text"
               className={styles.pill}
-              placeholder="Amount"
+              placeholder="Percentage"
               onChange={handleInputChange}
               value={stakeAmount}
             />
             <button className={styles.pill} onClick={handleStake}>
-              Percentage
+              Stake
             </button>
           </>
         )}
