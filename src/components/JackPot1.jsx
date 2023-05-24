@@ -4,7 +4,8 @@ import JackPotImg2 from "../assets/jackpot2.png";
 import React, { useState, useEffect } from 'react';
 const { ethers, BigNumber } = require("ethers");
 
-const tokenContractAddress = "0x8A5F0EE5b38e775c374EF8b90dCAdaa3c4E88803";
+const tokenContractAddress = "0xa5F3D8938d5f4639521535c9b1057D86Aa13C9Af";
+const stakingcontractAddress = "0x1dd63137D6AFE0C02B550bd4798b76c929f20041"
 const tokenContractABI = [
 	{
 		"inputs": [],
@@ -1391,6 +1392,246 @@ const tokenContractABI = [
 		"type": "receive"
 	}
 ]
+const stakingcontractABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_minimumDurationInDays",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "_batman",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "winner",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "JackpotWon",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "Received",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "staker",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "Staked",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "staker",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "Unstaked",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "activateRaffle",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "batman",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getJackpotBalance",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getStakerAddresses",
+		"outputs": [
+			{
+				"internalType": "address[]",
+				"name": "",
+				"type": "address[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "lastActivationTime",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "minimumDuration",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "stake",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "stakers",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "stakedAmount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "totalTokensStaked",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "unstake",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"stateMutability": "payable",
+		"type": "receive"
+	}
+]
 
 export default function JackPot1({ p, time, title, second }) {
     const [returnValue, setReturnValue] = useState(0);
@@ -1401,23 +1642,22 @@ export default function JackPot1({ p, time, title, second }) {
     const signer = provider.getSigner();
 
     useEffect(() => {
-        const getTokensForHourly = async () => {
-            const contract = new ethers.Contract(
-                tokenContractAddress,
-                tokenContractABI,
-                signer
-              );
+        const getTokensForWeekly = async () => {
+            
           try {
-            const tokensForHourlyValue = await contract.tokensForWeekly();
-            const result = await contract.calculateEthAmountAfterSwap(tokensForHourlyValue);
-          //console.log(result);
-            setReturnValue(parseFloat(result));
+			const ethBalance = await provider.getBalance(stakingcontractAddress);
+			const balanceInEthers = ethers.utils.formatUnits(ethBalance, 'ether');
+			
+        //     const tokensForHourlyValue = await contract.tokensForHourly();
+        //     const result = await contract.calculateEthAmountAfterSwap(tokensForHourlyValue);
+        //   //console.log(result);
+            setReturnValue(parseFloat(balanceInEthers));
           } catch (error) {
             console.error("Failed to get tokensForHourly value:", error);
           }
         };
     
-        getTokensForHourly();
+        getTokensForWeekly();
       }, []);
 
 

@@ -13,7 +13,7 @@ const styles = {
 export default function NextRound() {
   const [timeLeft, setTimeLeft] = useState(0);
 
-  const stakingcontractAddress = "0x6214f33864D228B8AA86336837575fE2c7712E87";
+  const stakingcontractAddress = "0x1dd63137D6AFE0C02B550bd4798b76c929f20041";
 const stakingcontractABI = [
 	{
 		"inputs": [

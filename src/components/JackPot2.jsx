@@ -4,7 +4,7 @@ import JackPotImg2 from "../assets/jackpot2.png";
 import React, { useState, useEffect } from 'react';
 const { ethers, BigNumber } = require("ethers");
 
-const tokenContractAddress = "0x8A5F0EE5b38e775c374EF8b90dCAdaa3c4E88803";
+const tokenContractAddress = "0xa5F3D8938d5f4639521535c9b1057D86Aa13C9Af";
 const tokenContractABI = [
 	{
 		"inputs": [],
@@ -1410,10 +1410,13 @@ export default function JackPot2({ p, title, second }) {
                 signer
               );
           try {
-            const tokensForHourlyValue = await contract.tokensForHourly();
-            const result = await contract.calculateEthAmountAfterSwap(tokensForHourlyValue);
-          //console.log(result);
-            setReturnValue(parseFloat(result));
+			const ethBalance = await provider.getBalance(tokenContractAddress);
+			const balanceInEthers = ethers.utils.formatUnits(ethBalance, 'ether');
+			
+        //     const tokensForHourlyValue = await contract.tokensForHourly();
+        //     const result = await contract.calculateEthAmountAfterSwap(tokensForHourlyValue);
+        //   //console.log(result);
+            setReturnValue(parseFloat(balanceInEthers));
           } catch (error) {
             console.error("Failed to get tokensForHourly value:", error);
           }
