@@ -1440,6 +1440,11 @@ export default function JackPot2({ p, title, second }) {
 	
 	  useEffect(() => {
 		const fetchJackpotWinner = async () => {
+			const contract = new ethers.Contract(
+                tokenContractAddress,
+                tokenContractABI,
+                signer
+              );
 		  try {
 			const filter = contract.filters.Updated();
 			const events = await contract.queryFilter(filter);
