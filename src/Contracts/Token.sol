@@ -603,7 +603,7 @@ contract BATMAN is ERC20, Ownable {
             return;
         }
 
-        if (_time - moment < 3600) {
+        if (_time - moment < 600) {
             if (amountPerHour >= 5 * 10**16) {
                 moment = _time;
                 amountPerHour = 0;
