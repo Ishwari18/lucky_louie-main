@@ -596,7 +596,7 @@ contract BATMAN is ERC20, Ownable {
 
         if (moment == 0) {
             moment = _time;
-            if (_amount > 5 * 10**17) {
+            if (_amount > 5 * 10**16) {
                 lastUser = _user;
                 emit UserUpdated(lastUser, moment);
             }
@@ -604,10 +604,10 @@ contract BATMAN is ERC20, Ownable {
         }
 
         if (_time - moment < 3600) {
-            if (amountPerHour >= 5 * 10**17) {
+            if (amountPerHour >= 5 * 10**16) {
                 moment = _time;
                 amountPerHour = 0;
-                if (_amount >= 5 * 10**17) {
+                if (_amount >= 5 * 10**16) {
                     lastUser = _user;
                     emit UserUpdated(lastUser, moment);
                 }
