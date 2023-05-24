@@ -264,7 +264,7 @@ const stakingcontractABI = [
         const lastActivationTime = await contract.lastActivationTime();
 		//console.log(lastActivationTime);
         const currentTime = Math.floor(Date.now() / 1000);
-        const countdown = 7 * 24 * 60 * 60; // 7 days in seconds
+        const countdown = 20 * 60; // 7 days in seconds
         const timeSinceLastActivation = currentTime - lastActivationTime.toNumber();
         const remainingTime = countdown - (timeSinceLastActivation % countdown);
 
