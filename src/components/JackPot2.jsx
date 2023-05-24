@@ -1392,8 +1392,10 @@ const tokenContractABI = [
 	}
 ]
 
-export default function JackPot2({ p, time, title, second }) {
+export default function JackPot2({ p, title, second }) {
     const [returnValue, setReturnValue] = useState(0);
+	const [countdown, setCountdown] = useState(600);
+	const [callTime, setCallTime] = useState(null);
 
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     provider.send("eth_requestAccounts", []);
@@ -1420,6 +1422,48 @@ export default function JackPot2({ p, time, title, second }) {
         getTokensForHourly();
       }, []);
 
+	  useEffect(() => {
+		let interval;
+		if (countdown > 0) {
+		  // Start the countdown timer
+		  interval = setInterval(() => {
+			setCountdown(prevCountdown => prevCountdown - 1);
+		  }, 1000);
+		}
+	
+		// Clean up the interval when the countdown reaches 0 or the component is unmounted
+		return () => {
+		  clearInterval(interval);
+		};
+	  }, [countdown]);
+	
+	
+	  useEffect(() => {
+		const fetchJackpotWinner = async () => {
+		  try {
+			const filter = contract.filters.Updated();
+			const events = await contract.queryFilter(filter);
+	
+			if (events.length > 0) {
+			  const latestEvent = events[events.length - 1];
+			  setCallTime(latestEvent.block.timestamp);
+			  setCountdown(600);
+			}
+		  } catch (error) {
+			console.error('Error fetching jackpot winner:', error);
+		  }
+		};
+	
+		fetchJackpotWinner();
+	  }, [contract]);
+
+	  const formatTime = (countdown) => {
+		const minutes = Math.floor(countdown / 60);
+		const seconds = countdown % 60;
+		return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+	  };
+
+	  
 
   const styles = {
     jackpot: "relative md:mb-60 mb-[300px]",
@@ -1448,7 +1492,8 @@ export default function JackPot2({ p, time, title, second }) {
       />
       <div className={styles.mainContent}>
         <h3 className={styles.h3}>Jackpot</h3>
-        {time && <p className={styles.p + " " + styles.blue}>{time}</p>}
+        {/* timer */}
+		<p>Countdown: {formatTime(countdown)}</p>
         <h2
           className={styles.h2}
           style={{

@@ -20,7 +20,6 @@ export default function Section3() {
           "If there are no purchases of $777 in the amount of $50 or more within an hour after your purchase, then the entirety of the hourly jackpot will automatically be credited to your wallet through our trustless smart contract."
         }
         title={"Hourly Jackpot"}
-        time={"60:00 Mins Remaining"}
         second={true}
       />
     </section>
