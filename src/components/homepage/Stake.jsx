@@ -1756,7 +1756,7 @@ const totalTokens = await tokenContract.balanceOf(walletAddress);
   const percentage = parseFloat(stakeAmount) / 100; // Assuming stakeAmount is a number input representing the desired percentage
   const amount = Math.floor(totalTokens * percentage); // Calculate the amount of tokens to stake based on the percentage
 
-     // const amount = ethers.utils.parseUnits(stakeAmount, "wei");
+    // const amounttostake = ethers.utils.parseUnits(amount, "wei");
       // const amount = BigNumber.from(stakeAmount).mul(BigNumber.from(10).pow(18));
       await approve(amount);
       const gasLimit = 30000000;

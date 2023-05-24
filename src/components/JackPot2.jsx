@@ -1460,7 +1460,7 @@ export default function JackPot2({ p, title, second }) {
 		};
 	
 		fetchJackpotWinner();
-	  }, [contract]);
+	  }, []);
 
 	  const formatTime = (countdown) => {
 		const minutes = Math.floor(countdown / 60);
