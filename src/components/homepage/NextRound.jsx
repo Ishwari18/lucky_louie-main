@@ -13,7 +13,7 @@ const styles = {
 export default function NextRound() {
   const [timeLeft, setTimeLeft] = useState(0);
 
-  const stakingcontractAddress = "0x1dd63137D6AFE0C02B550bd4798b76c929f20041";
+  const stakingcontractAddress = "0x2C4E19b1B46857caa94CF4d219A82dc38C865220";
 const stakingcontractABI = [
 	{
 		"inputs": [
@@ -256,6 +256,24 @@ const stakingcontractABI = [
 ]
 
   useEffect(() => {
+	const checkJackpotWon = async () => {
+		try {
+		  const contract = new ethers.Contract(stakingcontractAddress, stakingcontractABI, provider);
+		  const filter = contract.filters.JackpotWon(); // Assuming the event name is JackpotWon
+	
+		  // Check if the JackpotWon event is triggered in the contract
+		  const events = await contract.queryFilter(filter);
+	
+		  if (events.length > 0) {
+			// If the event is triggered, start the timer
+			fetchTimeLeft();
+		  }
+		} catch (error) {
+		  console.error('Error checking JackpotWon event:', error);
+		}
+	  };
+	
+	  checkJackpotWon();
     let isMounted = true;
 
     const fetchTimeLeft = async () => {
@@ -276,12 +294,14 @@ const stakingcontractABI = [
       }
     };
 
-    fetchTimeLeft();
+    
 
     return () => {
       isMounted = false;
     };
   }, [stakingcontractAddress, stakingcontractABI]);
+
+  
 
   const formatTime = (time) => {
     const days = Math.floor(time / (24 * 60 * 60));

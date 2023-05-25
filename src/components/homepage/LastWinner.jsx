@@ -12,7 +12,7 @@ const styles = {
   winnerInfo: "text-center mt-7",
 };
 
-const stakingcontractAddress = "0x1dd63137D6AFE0C02B550bd4798b76c929f20041";
+const stakingcontractAddress = "0x2C4E19b1B46857caa94CF4d219A82dc38C865220";
 const stakingcontractABI = [
 	{
 		"inputs": [

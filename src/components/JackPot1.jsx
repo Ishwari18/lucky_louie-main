@@ -1687,7 +1687,13 @@ export default function JackPot1({ p, time, title, second }) {
         alt=""
       />
       <div className={styles.mainContent}>
-        <h3 className={styles.h3}>Jackpot</h3>
+        <h3 style={{
+            background:
+              "linear-gradient(90deg, #B24FAB 2.41%, #D85388 106.17%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+          }} className={styles.h3}>Jackpot</h3>
         {time && <p className={styles.p + " " + styles.blue}>{time}</p>}
         <h2
           className={styles.h2}
