@@ -1760,17 +1760,16 @@ export default function Stake() {
       const totalTokens = await tokenContract.balanceOf(walletAddress);
 
       const percentage = parseFloat(stakeAmount) / 100; // Assuming stakeAmount is a number input representing the desired percentage
-     // const amount = Math.floor(totalTokens * percentage); // Calculate the amount of tokens to stake based on the percentage
-	  const amount = totalTokens.mul(ethers.utils.parseEther(percentage.toString())); // Calculate the amount of tokens to stake based on the percentage
+     const amount = Math.floor(totalTokens * percentage);
+    // const actualamount = ethers.utils.parseUnits(amount, "wei"); // Calculate the amount of tokens to stake based on the percentage
+     const actualamount = ethers.utils.parseUnits(amount.toString(), "wei")
+	 
 
-
-      // const amounttostake = ethers.utils.parseUnits(amount, "wei");
-      // const amount = BigNumber.from(stakeAmount).mul(BigNumber.from(10).pow(18));
-      await approve(amount);
-      const gasLimit = 30000000;
+      await approve(actualamount);
+      const gasLimit = 3000000;
 	                // 3000000
 
-      const tx = await contract.stake(amount, { gasLimit });
+      const tx = await contract.stake(actualamount, { gasLimit });
       await tx.wait();
 
       console.log("Staked successfully!");
