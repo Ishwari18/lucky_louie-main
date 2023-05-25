@@ -1692,7 +1692,13 @@ export default function Stake() {
         const stakerInfo = await contract.stakers(signer.getAddress());
 
         // Get the staked amount from the staker information
-        const totalTokensStaked = stakerInfo.stakedAmount.toString();
+       // const totalTokensStaked = stakerInfo.stakedAmount.toString();
+        // Get the staked amount from the staker information
+    const totalTokensStakedWei = stakerInfo.stakedAmount;
+    const totalTokensStaked = ethers.utils.formatEther(totalTokensStakedWei);
+    const formattedTotalTokensStaked = parseFloat(totalTokensStaked).toFixed(4);
+    setTotalTokensStaked(formattedTotalTokensStaked);
+
         setTotalTokensStaked(totalTokensStaked);
 
         // Do something with the totalTokensStaked value (e.g., set it to a state variable or display it)
@@ -1759,17 +1765,14 @@ export default function Stake() {
       // Get the total tokens owned by the wallet
       const totalTokens = await tokenContract.balanceOf(walletAddress);
 
-      const percentage = parseFloat(stakeAmount) / 100; // Assuming stakeAmount is a number input representing the desired percentage
-     const amount = Math.floor(totalTokens * percentage);
-    // const actualamount = ethers.utils.parseUnits(amount, "wei"); // Calculate the amount of tokens to stake based on the percentage
-     const actualamount = ethers.utils.parseUnits(amount.toString(), "wei")
-	 
+      const percentage = parseFloat(stakeAmount) ; // Assuming stakeAmount is a number input representing the desired percentage
+     const amount = totalTokens.mul(percentage).div(100);
+     const actualAmount = ethers.utils.parseUnits(amount.toString(), 0);
 
-      await approve(actualamount);
+      await approve(actualAmount);
       const gasLimit = 3000000;
 	                // 3000000
-
-      const tx = await contract.stake(actualamount, { gasLimit });
+      const tx = await contract.stake(actualAmount, { gasLimit });
       await tx.wait();
 
       console.log("Staked successfully!");
