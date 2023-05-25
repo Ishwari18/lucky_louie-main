@@ -271,7 +271,6 @@ export default function LastWinner() {
   useEffect(() => {
     const fetchJackpotWinner = async () => {
       try {
-
         const filter = contract.filters.JackpotWon();
         const events = await contract.queryFilter(filter);
 
@@ -283,7 +282,6 @@ export default function LastWinner() {
         console.error('Error fetching jackpot winner:', error);
       }
     };
-    
     fetchJackpotWinner();
   }, [stakingcontractAddress, provider]);
 
@@ -293,8 +291,9 @@ export default function LastWinner() {
       <h1 className={styles.h1}>Last Winner</h1>
       <img src={VibesGif} alt="" className={styles.imgContainer} />
       <div className={styles.winnerInfo}>
-        <p>{`${ethers.utils.formatEther(amountWon)} ETH`}</p>
-        <p>Winner's Address: {winnerAddress}</p>
+        <p >{`${ethers.utils.formatEther(amountWon)} ETH`}</p>
+		<p>Winner's Address: </p>
+        <p style={{ width: '100%', fontSize: '16px' }}>{winnerAddress}</p>
       </div>
     </div>
   );

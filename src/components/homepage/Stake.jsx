@@ -1794,15 +1794,16 @@ export default function Stake() {
         signer
       );
 
-      const sevenDaysInSeconds = 1; // 7 days in seconds
+      const oneMinuteInSeconds = 60 * 7; // 7 days in seconds
       const stake = await contract.stakers(signer.getAddress());
-      const { timestamp } = stake;
+      const timestamp = stake.timestamp.toNumber(); // Convert timestamp to number
+      console.log(timestamp);
 
       const currentTimestamp = Math.floor(Date.now() / 1000); // Get current timestamp in seconds
 
-      if (currentTimestamp < timestamp + sevenDaysInSeconds) {
+      if (currentTimestamp < timestamp + oneMinuteInSeconds) {
         throw new Error(
-          "Unstake not available yet, wait until 7 days after your last stake."
+          "Unstake not available yet, wait until 1 minute after your last stake."
         );
       }
 
